@@ -17,7 +17,7 @@
 
         body {
             font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(135deg, var(--bg-color) 0%, #4a121a; 100%);
+            background: linear-gradient(135deg, var(--bg-color) 0%, #4a121a 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -112,7 +112,6 @@
             transform: translateY(1px);
         }
         
-        /* Premium Live Preview Frame */
         .preview-label {
             font-size: 12px;
             text-transform: uppercase;
@@ -121,6 +120,8 @@
             margin-bottom: 10px;
             font-weight: 700;
         }
+        
+        /* The Card Container layout dimensions */
         #card-container {
             position: relative;
             width: 600px; 
@@ -136,7 +137,7 @@
             display: block;
         }
 
-        /* PERFECTLY CALIBRATED OVERLAY POSITION */
+        /* EXACT ALIGNMENT CONFIGURATION */
         .guest-name-overlay {
             position: absolute;
             top: 17.5%;        
@@ -177,14 +178,12 @@
     </div>
 
     <script>
-        // Dynamically updates the name on the card layout as you type
         function livePreviewName() {
             const input = document.getElementById('guestNameInput').value;
             const preview = document.getElementById('previewName');
             preview.innerText = input ? input : "Your Name Here";
         }
 
-        // Handles high-resolution PDF generation and exact naming
         function downloadCardPDF() {
             const guestName = document.getElementById('guestNameInput').value.trim();
             
@@ -195,19 +194,24 @@
 
             const cardElement = document.getElementById('card-container');
             
+            // CRUCIAL BUG FIX: Explicitly enforce internal window canvas widths 
+            // This prevents html2canvas from clipping out based on screen size restrictions.
             const options = {
                 margin:       0,
                 filename:     `You are most welcome ${guestName}.pdf`,
                 image:        { type: 'jpeg', quality: 1.0 }, 
                 html2canvas:  { 
-                    scale: 3,          // Scale 3 ensures the cursive script stays perfectly crisp in print
+                    scale: 3,
                     useCORS: true,
-                    logging: false
+                    logging: false,
+                    scrollX: 0,
+                    scrollY: 0,
+                    windowWidth: 600,  /* Forces the canvas window capture logic */
+                    windowHeight: 890  /* Keeps it locked to the actual container size */
                 }, 
                 jsPDF:        { unit: 'px', format: [600, 890], orientation: 'portrait' }
             };
 
-            // Execute PDF creation and trigger download
             html2pdf().set(options).from(cardElement).save();
         }
     </script>
