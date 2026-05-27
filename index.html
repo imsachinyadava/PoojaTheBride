@@ -597,7 +597,7 @@
             
             // BUG FIX 2: We define the vertical spacing based strictly on the height of the actual card, ignoring the font size.
             // If the words "Sachin Kumar Yadav" drop too low onto line 3, reduce this number (e.g., 0.032). If they are too high, increase it (e.g., 0.038).
-            const lineHeight = canvas.height * 0.025;    
+            const lineHeight = canvas.height * 0.03;    
 
             document.fonts.ready.then(() => {
                 wrapText(ctx, guestName, startX, startY, maxLineWidth, lineHeight);
