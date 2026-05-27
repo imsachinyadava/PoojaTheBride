@@ -4,10 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>POOJA THE BRIDE - Invitation Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Parisienne&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
+        /* LOAD YOUR CUSTOM DOWNLOADED FONT HERE */
+        @font-face {
+            font-family: 'Cameliya';
+            src: url('Cameliya.ttf') format('truetype'); 
+            font-weight: normal;
+            font-style: normal;
+        }
+
         :root {
             --primary-color: #721c24;
             --accent-gold: #d4af37;
@@ -32,8 +40,175 @@
             margin-bottom: 25px;
         }
         .header h1 {
-            font-family: 'Parisienne', cursive;
+            font-family: 'Cameliya', cursive; 
             font-size: 55px;
+            margin: 0;
+            color: var(--accent-gold);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            font-weight: normal; /* Normal weight so the custom font doesn't smear */
+        }
+        .header p {
+            margin: 5px 0 0 0;
+            font-size: 13px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #f1e1cb;
+            opacity: 0.8;
+        }
+
+        .control-panel {
+            background: rgba(255, 255, 255, 0.96);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            margin-bottom: 35px;
+            width: 100%;
+            max-width: 480px;
+            box-sizing: border-box;
+            border-bottom: 4px solid var(--accent-gold);
+        }
+        .control-panel h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        input[type="text"] {
+            padding: 14px 18px;
+            font-size: 16px;
+            border: 2px solid #e0d5c1;
+            border-radius: 8px;
+            outline: none;
+            text-align: center;
+        }
+        button {
+            padding: 15px 25px;
+            font-size: 15px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #521319 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(114,28,36,0.3);
+        }
+        
+        .preview-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        #card-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px; 
+            box-shadow: var(--card-shadow);
+            background-color: white;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+        .card-bg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .guest-name-overlay {
+            position: absolute;
+            top: 16.5%;        
+            left: 80%;       
+            width: 18%;      
+            font-family: 'Cameliya', cursive; /* Using the custom font */
+            font-weight: normal; 
+            font-size: clamp(14px, 2.5vw, 15px);   
+            color: #1a1a1a;    
+            text-align: left;
+            line-height: 1.0; 
+            word-wrap: break-word;
+            pointer-events: none; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Pooja The Bride's</h1>
+        <p>Wedding Invitation Portal</p>
+    </div>
+
+    <div class="control-panel">
+        <h2>Create Guest Invitation</h2>
+        <p style="color: #666; margin: 0; font-size: 14px;">Enter the name below to automatically generate a beautiful, print-ready PDF card.</p>
+        <div class="input-group">
+            <input type="text" id="guestNameInput" placeholder="Enter Guest Name Here..." oninput="livePreviewName()">
+            <button onclick="downloadCardPDF()">Download PDF Card</button>
+        </div>
+    </div>
+
+    <div class="preview-label">Live Preview Window</div>
+    <div id="card-container">
+        <img id="cardImage" class="card-bg" src="marriage-card-blank.jpeg" alt="Wedding Card Background">
+        <div class="guest-name-overlay" id="previewName">Your Name Here</div>
+    </div>
+
+    <script>
+        function wrapText(context, text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let currentLine = '';
+            let currentY = y;
+
+            for (let n = 0; n < words.length; n++) {
+                const testLine = currentLine + words[n] + ' ';
+                const metrics = context.measureText(testLine);
+                const testWidth = metrics.width;
+
+                if (testWidth > maxWidth && n > 0) {
+                    context.fillText(currentLine.trim(), x, currentY);
+                    currentLine = words[n] + ' ';
+                    currentY += lineHeight; 
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            context.fillText(currentLine.trim(), x, currentY);
+        }
+
+        function livePreviewName() {
+            const input = document.getElementById('guestNameInput').value;
+            const preview = document.getElementById('previewName');
+            preview.innerText = input ? input : "Your Name Here";
+        }
+
+        function downloadCardPDF() {
+            const guestName = document.getElementById('guestNameInput').value.trim();
+            if (!guestName) {
+                alert("Please type a guest name before downloading!");
+                return;
+            }
+
+            const imgElement = document.getElementById('cardImage');
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = imgElement.naturalWidth;
+            canvas.height = imgElement.naturalHeight;
+            
+            ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
+            
+            // Your exact custom sizing
+            const calculatedFontSize = Math.floor(canvas.width
             margin: 0;
             color: var(--accent-gold);
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
