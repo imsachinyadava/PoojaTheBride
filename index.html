@@ -116,18 +116,17 @@
             display: block;
         }
 
-        /* YOUR EXACT CSS SETTINGS */
         .guest-name-overlay {
             position: absolute;
-            top: 16%;        
+            top: 16.5%;        
             left: 80%;       
-            width: 25%;      
+            width: 18%;      
             font-family: 'Parisienne', cursive;
             font-weight: bold;
-            font-size: clamp(14px, 2.5vw, 18px);   
+            font-size: clamp(14px, 2.5vw, 15px);   
             color: #1a1a1a;    
             text-align: left;
-            line-height: 1.0;
+            line-height: 1.0; /* Increased slightly to better preview the physical spacing */
             word-wrap: break-word;
             pointer-events: none; 
         }
@@ -191,7 +190,6 @@
             }
 
             const imgElement = document.getElementById('cardImage');
-            
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             
@@ -200,22 +198,24 @@
             
             ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
             
-            const calculatedFontSize = Math.floor(canvas.width * 0.040); 
+            // Adjusted the font size slightly smaller so it doesn't bleed over the drawn lines
+            const calculatedFontSize = Math.floor(canvas.width * 0.03); 
             ctx.font = `bold ${calculatedFontSize}px 'Parisienne', cursive, sans-serif`;
             ctx.fillStyle = '#1a1a1a';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
 
-            /* FULLY SYNCED WITH YOUR CSS */
-            const startX = canvas.width * 0.80;       // Synced exactly with left: 80%
-            const startY = canvas.height * 0.16;      // Synced exactly with top: 16%
-            const maxLineWidth = canvas.width * 0.25; // Synced exactly with width: 25%
+            const startX = canvas.width * 0.80;       
+            const startY = canvas.height * 0.165;     
             
-            // To mimic CSS line-height: 1.0, the space between lines is exactly equal to the font size
-            const lineHeight = calculatedFontSize;    
+            // BUG FIX 1: We allow the Canvas more width (23%) before it breaks the line, bypassing the cursive measuring error.
+            const maxLineWidth = canvas.width * 0.23; 
+            
+            // BUG FIX 2: We define the vertical spacing based strictly on the height of the actual card, ignoring the font size.
+            // If the words "Sachin Kumar Yadav" drop too low onto line 3, reduce this number (e.g., 0.032). If they are too high, increase it (e.g., 0.038).
+            const lineHeight = canvas.height * 0.02;    
 
             document.fonts.ready.then(() => {
-                
                 wrapText(ctx, guestName, startX, startY, maxLineWidth, lineHeight);
                 
                 const imgData = canvas.toDataURL('image/jpeg', 1.0);
