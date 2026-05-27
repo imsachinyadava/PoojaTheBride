@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POOJA THE BRIDE - Invitation Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Parisienne&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #721c24;
+            --accent-gold: #d4af37;
+            --bg-color: #2b0811;
+            --card-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, var(--bg-color) 0%, #4a121a; 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            margin: 0;
+            color: #fff;
+        }
+
+        /* Luxury Header */
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .header h1 {
+            font-family: 'Parisienne', cursive;
+            font-size: 55px;
+            margin: 0;
+            color: var(--accent-gold);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .header p {
+            margin: 5px 0 0 0;
+            font-size: 13px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #f1e1cb;
+            opacity: 0.8;
+        }
+
+        /* Clean & Modern Control Panel */
+        .control-panel {
+            background: rgba(255, 255, 255, 0.96);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            margin-bottom: 35px;
+            width: 100%;
+            max-width: 480px;
+            box-sizing: border-box;
+            border-bottom: 4px solid var(--accent-gold);
+        }
+        .control-panel h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        input[type="text"] {
+            padding: 14px 18px;
+            font-size: 16px;
+            font-family: 'Montserrat', sans-serif;
+            border: 2px solid #e0d5c1;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.3s;
+            text-align: center;
+            font-weight: 500;
+        }
+        input[type="text"]:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px rgba(114, 28, 36, 0.2);
+        }
+        button {
+            padding: 15px 25px;
+            font-size: 15px;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #521319 100%);
+            color: #fff;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(114,28,36,0.3);
+        }
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(114,28,36,0.4);
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        /* Premium Live Preview Frame */
+        .preview-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        #card-container {
+            position: relative;
+            width: 600px; 
+            height: 890px; 
+            box-shadow: var(--card-shadow);
+            background-color: white;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+        .card-bg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* PERFECTLY CALIBRATED OVERLAY POSITION */
+        .guest-name-overlay {
+            position: absolute;
+            top: 17.5%;        
+            left: 96%;       
+            transform: translate(-50%, -50%);
+            width: 190px;      
+            font-family: 'Parisienne', cursive;
+            font-weight: bold;
+            font-size: 18px;   
+            color: #1a1a1a;    
+            text-align: left;
+            line-height: 1.2;
+            word-wrap: break-word;
+            pointer-events: none; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Pooja The Bride's</h1>
+        <p>Wedding Invitation Portal</p>
+    </div>
+
+    <div class="control-panel">
+        <h2>Create Guest Invitation</h2>
+        <p style="color: #666; margin: 0; font-size: 14px;">Enter the name below to automatically generate a beautiful, print-ready PDF card.</p>
+        <div class="input-group">
+            <input type="text" id="guestNameInput" placeholder="Enter Guest Name Here..." oninput="livePreviewName()">
+            <button onclick="downloadCardPDF()">Download PDF Card</button>
+        </div>
+    </div>
+
+    <div class="preview-label">Live Preview Window</div>
+    <div id="card-container">
+        <img class="card-bg" src="marriage-card-blank.jpeg" alt="Wedding Card Background">
+        <div class="guest-name-overlay" id="previewName">Your Name Here</div>
+    </div>
+
+    <script>
+        // Dynamically updates the name on the card layout as you type
+        function livePreviewName() {
+            const input = document.getElementById('guestNameInput').value;
+            const preview = document.getElementById('previewName');
+            preview.innerText = input ? input : "Your Name Here";
+        }
+
+        // Handles high-resolution PDF generation and exact naming
+        function downloadCardPDF() {
+            const guestName = document.getElementById('guestNameInput').value.trim();
+            
+            if (!guestName) {
+                alert("Please type a guest name before downloading!");
+                return;
+            }
+
+            const cardElement = document.getElementById('card-container');
+            
+            const options = {
+                margin:       0,
+                filename:     `You are most welcome ${guestName}.pdf`,
+                image:        { type: 'jpeg', quality: 1.0 }, 
+                html2canvas:  { 
+                    scale: 3,          // Scale 3 ensures the cursive script stays perfectly crisp in print
+                    useCORS: true,
+                    logging: false
+                }, 
+                jsPDF:        { unit: 'px', format: [600, 890], orientation: 'portrait' }
+            };
+
+            // Execute PDF creation and trigger download
+            html2pdf().set(options).from(cardElement).save();
+        }
+    </script>
+</body>
+</html>
