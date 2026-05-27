@@ -218,7 +218,7 @@
             document.fonts.ready.then(() => {
                 wrapText(ctx, guestName, startX, startY, maxLineWidth, lineHeight);
                 
-                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                const imgData = canvas.toDataURL('image/jpeg', 0.75);
                 const { jsPDF } = window.jspdf;
                 
                 const pdf = new jsPDF({
