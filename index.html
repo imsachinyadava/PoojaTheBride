@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>POOJA THE BRIDE - Invitation Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Parisienne&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Parisienne&family=Montserrat:wght@400;500;700&display=swap"
+        rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
@@ -12,7 +14,7 @@
             --primary-color: #721c24;
             --accent-gold: #d4af37;
             --bg-color: #2b0811;
-            --card-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            --card-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
         }
 
         body {
@@ -31,13 +33,15 @@
             text-align: center;
             margin-bottom: 25px;
         }
+
         .header h1 {
             font-family: 'Parisienne', cursive;
             font-size: 55px;
             margin: 0;
             color: var(--accent-gold);
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
+
         .header p {
             margin: 5px 0 0 0;
             font-size: 13px;
@@ -51,7 +55,7 @@
             background: rgba(255, 255, 255, 0.96);
             padding: 30px;
             border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             text-align: center;
             margin-bottom: 35px;
             width: 100%;
@@ -59,18 +63,21 @@
             box-sizing: border-box;
             border-bottom: 4px solid var(--accent-gold);
         }
+
         .control-panel h2 {
             margin-top: 0;
             color: var(--primary-color);
             font-size: 20px;
             font-weight: 700;
         }
+
         .input-group {
             display: flex;
             flex-direction: column;
             gap: 15px;
             margin-top: 20px;
         }
+
         input[type="text"] {
             padding: 14px 18px;
             font-size: 16px;
@@ -79,6 +86,7 @@
             outline: none;
             text-align: center;
         }
+
         button {
             padding: 15px 25px;
             font-size: 15px;
@@ -89,9 +97,9 @@
             cursor: pointer;
             font-weight: 700;
             text-transform: uppercase;
-            box-shadow: 0 4px 15px rgba(114,28,36,0.3);
+            box-shadow: 0 4px 15px rgba(114, 28, 36, 0.3);
         }
-        
+
         .preview-label {
             font-size: 12px;
             text-transform: uppercase;
@@ -105,12 +113,13 @@
         #card-container {
             position: relative;
             width: 100%;
-            max-width: 500px; 
+            max-width: 500px;
             box-shadow: var(--card-shadow);
             background-color: white;
             overflow: hidden;
             border-radius: 4px;
         }
+
         .card-bg {
             width: 100%;
             height: auto;
@@ -120,21 +129,31 @@
         /* Visual CSS Overlay Alignment */
         .guest-name-overlay {
             position: absolute;
-            top: 31.7%;        
-            left: 81.5%;       
-            transform: translate(-50%, -50%);
-            width: 30%;      
+            top: 16%;
+            left: 81%;
+            /* Adjusted left so the container starts right at the beginning of the line */
+            width: 95px;
+            /* Set a strict maximum width so the text knows exactly when to wrap to the next line */
+
             font-family: 'Parisienne', cursive;
             font-weight: bold;
-            font-size: clamp(14px, 2.5vw, 22px);   
-            color: #1a1a1a;    
+            font-size: clamp(12px, 2.5vw, 15px);
+            color: #1a1a1a;
+
             text-align: left;
             line-height: 1.2;
-            word-wrap: break-word;
-            pointer-events: none; 
+            /* Increased slightly so if it wraps, the two lines don't crash into each other */
+
+            /* These three lines force long names/words to break and wrap cleanly */
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: break-word;
+
+            pointer-events: none;
         }
     </style>
 </head>
+
 <body>
 
     <div class="header">
@@ -144,7 +163,8 @@
 
     <div class="control-panel">
         <h2>Create Guest Invitation</h2>
-        <p style="color: #666; margin: 0; font-size: 14px;">Enter the name below to automatically generate a beautiful, print-ready PDF card.</p>
+        <p style="color: #666; margin: 0; font-size: 14px;">Enter the name below to automatically generate a beautiful,
+            print-ready PDF card.</p>
         <div class="input-group">
             <input type="text" id="guestNameInput" placeholder="Enter Guest Name Here..." oninput="livePreviewName()">
             <button onclick="downloadCardPDF()">Download PDF Card</button>
@@ -172,50 +192,51 @@
             }
 
             const imgElement = document.getElementById('cardImage');
-            
+
             // Create a virtual high-res canvas matching the actual dimensions of the original image file
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            
+
             canvas.width = imgElement.naturalWidth;
             canvas.height = imgElement.naturalHeight;
-            
+
             // 1. Draw the clean card image onto the canvas pixels
             ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
-            
+
             // 2. Set up the exact text positioning using percentages calculated from the image file dimensions
             // Top/Left map directly over your invitation box
-            const textX = canvas.width * 0.705;  
-            const textY = canvas.height * 0.318; 
-            
+            const textX = canvas.width * 0.705;
+            const textY = canvas.height * 0.318;
+
             // 3. Size the text proportionally relative to the high-resolution source file width
-            const calculatedFontSize = Math.floor(canvas.width * 0.038); 
-            
+            const calculatedFontSize = Math.floor(canvas.width * 0.038);
+
             // 4. Paint the text using standard cursive on the canvas
             ctx.font = `bold ${calculatedFontSize}px 'Parisienne', cursive, sans-serif`;
             ctx.fillStyle = '#1a1a1a';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'middle';
-            
+
             // Wait for custom fonts to fully register on canvas before executing
             document.fonts.ready.then(() => {
                 ctx.fillText(guestName, textX, textY);
-                
+
                 // 5. Package the finalized drawing canvas into a zero-margin PDF bundle
                 const imgData = canvas.toDataURL('image/jpeg', 1.0);
                 const { jsPDF } = window.jspdf;
-                
+
                 // Lock the PDF page layout constraints cleanly around the original image size parameters
                 const pdf = new jsPDF({
                     orientation: 'portrait',
                     unit: 'px',
                     format: [canvas.width, canvas.height]
                 });
-                
+
                 pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
                 pdf.save(`You are most welcome ${guestName}.pdf`);
             });
         }
     </script>
 </body>
+
 </html>
