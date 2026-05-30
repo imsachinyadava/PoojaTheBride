@@ -209,7 +209,7 @@
             const startY = canvas.height * 0.165;     
             
             // BUG FIX 1: We allow the Canvas more width (23%) before it breaks the line, bypassing the cursive measuring error.
-            const maxLineWidth = canvas.width * 0.23; 
+            const maxLineWidth = canvas.width * 0.18; 
             
             // BUG FIX 2: We define the vertical spacing based strictly on the height of the actual card, ignoring the font size.
             // If the words "Sachin Kumar Yadav" drop too low onto line 3, reduce this number (e.g., 0.032). If they are too high, increase it (e.g., 0.038).
